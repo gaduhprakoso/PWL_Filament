@@ -21,55 +21,71 @@ class PostForm
         return $schema
             ->components([
 
-                // 1. Fields Kiri (Mengambil 2/3 bagian dari total 3 kolom)
+                // 1. Fields Kiri (2/3 Kolom)
                 ComponentsSection::make("Post Details")
                     ->description("Isi detail utama postingan di sini")
-                    ->icon('heroicon-o-document-text') // Tugas 2: Icon Section 1
+                    ->icon('heroicon-o-document-text')
                     ->schema([
 
-                        // Tugas 3: Buat tampilan lebih rapi (2 kolom untuk field utama)
                         ComponentsGroup::make([
+                            // Validasi Title: Minimal 5 karakter + Custom Message
                             TextInput::make("title")
-                                ->required(),
+                                ->required()
+                                ->minLength(5)
+                                ->validationMessages([
+                                    'minLength' => 'Judulnya trtlslu pendek, minimal 5 karakter',
+                                    'required' => 'Judul tidak boleh kosong.',
+                                ]),
+
+                            // Validasi Slug: Unik, Minimal 3 karakter + Custom Message
                             TextInput::make("slug")
-                                ->required(),
+                                ->required()
+                                ->minLength(3)
+                                ->unique(ignoreRecord: true)
+                                ->validationMessages([
+                                    'unique' => 'Waduh, slug ini sudah dipakai postingan lain.',
+                                    'minLength' => 'Slug minimal 3 karakter.',
+                                ]),
+
+                            // Validasi Category: Wajib dipilih
                             Select::make("category_id")
                                 ->relationship("category", "name")
                                 ->preload()
+                                ->required()
                                 ->searchable(),
+
                             ColorPicker::make("color"),
                         ])->columns(2),
 
                         MarkdownEditor::make("content")
                             ->columnSpanFull(),
                     ])
-                    ->columnSpan(2), // Tugas 1: Layout Kiri (2/3)
+                    ->columnSpan(2),
 
-                // 2. Meta Kanan (Mengambil 1/3 bagian sisanya)
+                // 2. Meta Kanan (1/3 Kolom)
                 ComponentsGroup::make([
 
-                    // Section Image
-                    ComponentsSection::make("Post Details")
-                        ::make("Media")
-                        ->icon('heroicon-o-photo') // Tugas 2: Icon Section 2
+                    // Section Media - Validasi Image: Wajib diupload
+                    ComponentsSection::make("Media")
+                        ->icon('heroicon-o-photo')
                         ->schema([
                             FileUpload::make("image")
+                                ->required()
                                 ->disk("public")
                                 ->directory("posts"),
                         ]),
 
                     // Section Meta Informasi
-                    ComponentsSection::make("Post Details")
-                        ::make("Meta Information")
-                        ->icon('heroicon-o-information-circle') // Tugas 2: Icon Section 3
+                    ComponentsSection::make("Meta Information")
+                        ->icon('heroicon-o-information-circle')
                         ->schema([
                             TagsInput::make("tags"),
                             Checkbox::make("published"),
                             DateTimePicker::make("published_at"),
                         ]),
 
-                ])->columnSpan(1), // Tugas 1: Layout Kanan (1/3)
+                ])->columnSpan(1),
 
-            ])->columns(3); // Dasar grid 3 kolom untuk pembagian 2/3 dan 1/3
+            ])->columns(3);
     }
 }
