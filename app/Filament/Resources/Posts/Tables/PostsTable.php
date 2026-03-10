@@ -12,18 +12,25 @@ use Filament\Tables\Columns\ImageColumn;
 
 class PostsTable
 {
-    public static function configure(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
                 //
-                TextColumn::make('title'),
-                TextColumn::make('slug'),
-                TextColumn::make('category.name'),
+                TextColumn::make('title')
+                    ->sortable(),
+                TextColumn::make('slug')
+                    ->sortable(),
+                TextColumn::make('category.name')
+                    ->sortable(),
                 ColorColumn::make('color'),
                 ImageColumn::make('image')
-                    ->disk('public')
-            ])
+                    ->disk('public'),
+                TextColumn::make('created_at')
+                    ->label('Created At')
+                    ->dateTime()
+                    ->sortable(),
+            ])->defaultSort('title', 'asc')
             ->filters([
                 //
             ])
